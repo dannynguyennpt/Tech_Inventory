@@ -1,0 +1,3081 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMIT Inventory Parts - Tra cứu & Quản lý Hình ảnh Vật tư</title>
+  <style>
+    :root {
+      --primary: #0f4c81;
+      --primary-light: #e8f1f8;
+      --primary-hover: #0b3960;
+      --accent: #0284c7;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --gray-900: #0f172a;
+      --radius: 10px;
+      --shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f1f5f9;
+      color: var(--gray-900);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #0f172a 0%, #0f4c81 100%);
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .brand-title h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-title p {
+      font-size: 12px;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .server-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .server-online {
+      background: rgba(22, 163, 74, 0.25);
+      color: #86efac;
+      border: 1px solid rgba(134, 239, 172, 0.4);
+    }
+    .server-offline {
+      background: rgba(217, 119, 6, 0.25);
+      color: #fde68a;
+      border: 1px solid rgba(253, 230, 138, 0.4);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-light {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-light:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #0369a1;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+    .btn-success:hover {
+      background: #15803d;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--gray-700);
+      border-color: var(--gray-300);
+    }
+    .btn-outline:hover {
+      background: var(--gray-50);
+      border-color: var(--gray-500);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1640px;
+      margin: 0 auto;
+      padding: 18px 24px 40px;
+    }
+
+    /* Filter Panel */
+    .filter-panel {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 0 1 450px;
+      max-width: 450px;
+      min-width: 260px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 11px 68px 11px 38px;
+      font-size: 14px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-500);
+      font-size: 15px;
+      pointer-events: none;
+    }
+
+    .search-camera-btn {
+      position: absolute;
+      right: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+      color: var(--gray-500);
+      padding: 4px;
+      line-height: 1;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+
+    .search-camera-btn:hover {
+      color: var(--primary);
+      transform: translateY(-50%) scale(1.15);
+      background: var(--gray-100);
+    }
+
+    .clear-search {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--gray-200);
+      border: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 11px;
+      color: var(--gray-700);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .clear-search:hover {
+      background: var(--gray-300);
+    }
+
+    /* Image Search Banner */
+    .image-search-banner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+      border: 1.5px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      position: relative;
+      animation: modalFadeIn 0.25s ease-out;
+    }
+
+    .isb-preview img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .isb-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .isb-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .isb-badge {
+      background: #2563eb;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .isb-title {
+      font-size: 13px;
+      color: #1e293b;
+    }
+
+    .isb-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .isb-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #1e40af;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+
+    .isb-tag:hover {
+      background: #dbeafe;
+      border-color: #3b82f6;
+      color: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    .isb-tag.active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+      font-weight: 600;
+    }
+
+    .isb-close {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      color: #64748b;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+
+    .isb-close:hover {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+
+    /* Image Search Dropzone in Modal */
+    .img-search-dropzone {
+      border: 2px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 28px 20px;
+      text-align: center;
+      background: var(--gray-50);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .img-search-dropzone:hover, .img-search-dropzone.dragover {
+      border-color: var(--accent);
+      background: #eff6ff;
+    }
+
+    .isd-icon {
+      font-size: 38px;
+      margin-bottom: 8px;
+    }
+
+    .isd-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+
+    .isd-sub {
+      font-size: 12px;
+      color: var(--gray-500);
+    }
+
+    .isd-sub strong {
+      color: var(--primary);
+    }
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--gray-700);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .clear-search:hover {
+      background: var(--gray-300);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .filter-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 5px;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--gray-300);
+      border-radius: 6px;
+      font-size: 13px;
+      background-color: #fff;
+      color: var(--gray-900);
+      outline: none;
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+      border-color: var(--accent);
+    }
+
+    /* Table Toolbar */
+    .table-container {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: var(--gray-50);
+    }
+
+    .result-info {
+      font-size: 13px;
+      color: var(--gray-700);
+    }
+
+    .result-info strong {
+      color: var(--primary);
+      font-size: 14px;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pagination-controls select {
+      padding: 5px 8px;
+      border: 1px solid var(--gray-300);
+      border-radius: 6px;
+      font-size: 12px;
+      background: #fff;
+    }
+
+    .page-btn {
+      padding: 5px 10px;
+      border: 1px solid var(--gray-300);
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .page-btn:not(:disabled):hover {
+      background: var(--gray-100);
+    }
+
+    /* Data Table */
+    .table-scroll {
+      overflow-x: auto;
+      max-height: 68vh;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      color: var(--gray-700);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 11px 10px;
+      border-bottom: 2px solid var(--gray-200);
+      white-space: nowrap;
+      user-select: none;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    thead th:hover {
+      background: #e2e8f0;
+    }
+
+    .sort-indicator {
+      margin-left: 4px;
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--gray-100);
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f9ff;
+    }
+
+    tbody td {
+      padding: 9px 10px;
+      vertical-align: middle;
+      font-size: 13px;
+      color: var(--gray-900);
+    }
+
+    .part-no-cell {
+      font-family: "Consolas", "Courier New", monospace;
+      font-weight: 700;
+      color: var(--primary);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .copy-btn {
+      border: 1px solid var(--gray-300);
+      background: #fff;
+      color: var(--gray-500);
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-size: 11px;
+      cursor: pointer;
+      opacity: 0.65;
+      transition: all 0.15s;
+    }
+
+    tbody tr:hover .copy-btn {
+      opacity: 1;
+    }
+
+    .copy-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Picture Action Buttons in Row */
+    .pic-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .pic-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .pic-btn-capture {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+    }
+    .pic-btn-capture:hover {
+      background: #1d4ed8;
+      color: #fff;
+    }
+
+    .pic-btn-upload {
+      background: #fdf4ff;
+      color: #9333ea;
+      border-color: #f0abfc;
+    }
+    .pic-btn-upload:hover {
+      background: #9333ea;
+      color: #fff;
+    }
+
+    .pic-btn-view-has {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #86efac;
+    }
+    .pic-btn-view-has:hover {
+      background: #16a34a;
+      color: #fff;
+    }
+
+    .pic-btn-view-empty {
+      background: var(--gray-100);
+      color: var(--gray-500);
+      border-color: var(--gray-200);
+    }
+    .pic-btn-view-empty:hover {
+      background: var(--gray-200);
+      color: var(--gray-700);
+    }
+
+    .mini-thumb {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 1px solid #86efac;
+      flex-shrink: 0;
+    }
+
+    .desc-main {
+      font-weight: 600;
+      color: var(--gray-900);
+      max-width: 390px;
+      word-break: break-word;
+    }
+
+    .desc-sub {
+      font-size: 11.5px;
+      color: var(--gray-500);
+      margin-top: 2px;
+    }
+
+    .qty-badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12.5px;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .qty-in-stock {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .qty-out-stock {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-ACTIVE {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .status-INACTIVE {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+    .status-TRACKING {
+      background: #fef3c7;
+      color: #b45309;
+    }
+    .status-EXPIRED {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .family-tag {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    mark.hl {
+      background-color: #fde047;
+      color: #0f172a;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 12px;
+      max-width: 780px;
+      width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+      animation: modalFadeIn 0.15s ease;
+    }
+
+    .modal-card.modal-lg {
+      max-width: 960px;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--gray-50);
+    }
+
+    .modal-header h3 {
+      font-size: 17px;
+      color: var(--primary);
+      font-family: "Consolas", monospace;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      color: var(--gray-500);
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--gray-200);
+      background: var(--gray-50);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .detail-item {
+      background: var(--gray-50);
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--gray-200);
+    }
+
+    .detail-item.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .detail-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .detail-val {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-900);
+      word-break: break-word;
+    }
+
+    /* Capture / Upload Modal UI */
+    .capture-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--gray-200);
+      padding-bottom: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tab-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--gray-300);
+      background: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--gray-700);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .camera-box {
+      background: #0f172a;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      margin-bottom: 14px;
+    }
+
+    .camera-box video {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .camera-controls {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--accent);
+      background: #f0f9ff;
+      border-radius: 10px;
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 14px;
+    }
+
+    .dropzone:hover,
+    .dropzone.dragover {
+      background: #e0f2fe;
+      border-color: var(--primary);
+    }
+
+    .Staging-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .staging-item {
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--gray-50);
+      position: relative;
+    }
+
+    .staging-item img {
+      width: 100%;
+      height: 115px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .staging-meta {
+      padding: 6px 8px;
+      font-size: 11px;
+      color: var(--gray-700);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .staging-remove {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(220, 38, 38, 0.9);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    /* Gallery Lightbox Modal */
+    .gallery-viewer {
+      background: #0f172a;
+      border-radius: 10px;
+      min-height: 420px;
+      max-height: 62vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .gallery-viewer img {
+      max-width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      transition: transform 0.2s ease;
+    }
+
+    .gallery-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .gallery-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .gallery-prev {
+      left: 14px;
+    }
+    .gallery-next {
+      right: 14px;
+    }
+
+    .gallery-thumbs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 6px 2px;
+    }
+
+    .gallery-thumb-item {
+      width: 76px;
+      height: 60px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      flex-shrink: 0;
+      opacity: 0.65;
+      transition: all 0.15s;
+    }
+
+    .gallery-thumb-item.active {
+      border-color: var(--accent);
+      opacity: 1;
+      transform: scale(1.04);
+    }
+
+    .gallery-thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0f172a;
+      color: #fff;
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 3000;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--gray-500);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-icon">📦</div>
+      <div class="brand-title">
+        <h1>CMIT Inventory Parts &amp; Picture Manager</h1>
+        <p>
+          <span id="dataSourceStatus">Đang tải dữ liệu tồn kho...</span>
+          <span id="serverStatusBadge" class="server-badge server-offline">🔄 Đang kết nối thư mục Picture...</span>
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+
+    <!-- Search & Filter Panel -->
+    <section class="filter-panel">
+      <div class="search-row">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Tìm theo Part No, Tên mô tả vật tư, Mã hiệu..."
+            autocomplete="off"
+          />
+          <button type="button" class="search-camera-btn" id="cameraSearchBtn" title="Tìm bằng hình ảnh (Chụp / Tải ảnh nhãn mác, nameplate)">📷</button>
+          <button class="clear-search" id="clearSearchBtn" title="Xóa tìm kiếm">✕</button>
+        </div>
+        <button type="button" class="btn btn-outline" id="imgSearchActionBtn" title="Tìm kiếm vật tư bằng hình ảnh hoặc dán ảnh chụp màn hình (Ctrl+V)">
+          📷 Tìm bằng ảnh
+        </button>
+        <button class="btn btn-outline" id="resetFiltersBtn">🔄 Đặt lại bộ lọc</button>
+        <input type="file" id="imageSearchInput" accept="image/*" style="display: none;" />
+      </div>
+
+      <!-- Banner kết quả nhận diện ảnh -->
+      <div id="imageSearchResultBanner" class="image-search-banner" style="display: none;">
+        <div class="isb-preview">
+          <img id="isbImgThumb" src="" alt="Ảnh tìm kiếm" />
+        </div>
+        <div class="isb-content">
+          <div class="isb-header">
+            <span class="isb-badge">✨ Nhận diện hình ảnh &amp; Font</span>
+            <span id="isbStatusText" class="isb-title">Đã tìm thấy vật tư</span>
+          </div>
+          <div id="isbTags" class="isb-tags"></div>
+        </div>
+        <button type="button" id="isbCloseBtn" class="isb-close" title="Tắt kết quả tìm bằng ảnh">✕ Đóng</button>
+      </div>
+
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="groupFilter">Nhóm thiết bị / Nhóm hàng (Group)</label>
+          <select id="groupFilter">
+            <option value="">-- Tất cả nhóm (Group) --</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="stockFilter">Tình trạng tồn kho (Stock Qty)</label>
+          <select id="stockFilter">
+            <option value="">-- Tất cả tồn kho --</option>
+            <option value="IN_STOCK">Còn hàng (Stock &gt; 0)</option>
+            <option value="OUT_OF_STOCK">Hết hàng (Stock = 0)</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="picFilter">Hình ảnh (Picture)</label>
+          <select id="picFilter">
+            <option value="">-- Tất cả --</option>
+            <option value="HAS_PIC">Đã có ảnh trong Picture</option>
+            <option value="NO_PIC">Chưa có ảnh</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="abcFilter">Phân loại ABC</label>
+          <select id="abcFilter">
+            <option value="">-- Tất cả (A / B / C) --</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data Table -->
+    <section class="table-container">
+      <div class="table-toolbar">
+        <div class="result-info" id="resultCountInfo">
+          Đang hiển thị <strong>0</strong> kết quả
+        </div>
+        <div class="pagination-controls">
+          <label for="pageSizeSelect" style="font-size: 12px; color: var(--gray-500);">Hiển thị:</label>
+          <select id="pageSizeSelect">
+            <option value="50">50 dòng / trang</option>
+            <option value="100">100 dòng / trang</option>
+            <option value="200">200 dòng / trang</option>
+            <option value="500">500 dòng / trang</option>
+          </select>
+          <button class="page-btn" id="prevPageBtn">◀ Trước</button>
+          <span id="pageInfoText" style="font-size: 12.5px; font-weight: 600; padding: 0 6px;">Trang 1 / 1</span>
+          <button class="page-btn" id="nextPageBtn">Sau ▶</button>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th data-sort="Part No">Part No <span class="sort-indicator" id="sort-Part No"></span></th>
+              <th data-sort="Part Description in Use">Tên &amp; Mô tả vật tư (In Use) <span class="sort-indicator" id="sort-Part Description in Use"></span></th>
+              <th data-sort="Type Designation">Mã hiệu (Type Designation) <span class="sort-indicator" id="sort-Type Designation"></span></th>
+              <th style="text-align: center; cursor: default;">Hình ảnh (Picture)</th>
+              <th data-sort="Group">Nhóm (Group) <span class="sort-indicator" id="sort-Group"></span></th>
+              <th data-sort="Stock" style="text-align: center;">Stock Qty <span class="sort-indicator" id="sort-Stock"></span></th>
+              <th data-sort="PO_Pending_Qty" style="text-align: center;">PO Pending <span class="sort-indicator" id="sort-PO_Pending_Qty"></span></th>
+              <th data-sort="Inventory UoM">ĐVT</th>
+              <th data-sort="Dimension/Quality">Hệ thống / Vị trí <span class="sort-indicator" id="sort-Dimension/Quality"></span></th>
+              <th data-sort="Product Family Description">Nhóm ngành <span class="sort-indicator" id="sort-Product Family Description"></span></th>
+              <th data-sort="Part Status Description">Trạng thái <span class="sort-indicator" id="sort-Part Status Description"></span></th>
+              <th data-sort="Expected Lead Time" style="text-align: center;">Lead Time <span class="sort-indicator" id="sort-Expected Lead Time"></span></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- 1. Capture & Auto-Resize Photo Modal -->
+  <div class="modal-backdrop" id="captureModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="capModalTitle">📷 Chụp / Thêm ảnh vật tư</h3>
+          <p id="capModalSub" style="font-size: 13px; color: var(--gray-700); margin-top: 3px;"></p>
+        </div>
+        <button class="modal-close" id="closeCaptureModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="capture-tabs">
+          <div class="tab-group">
+            <button class="tab-btn active" id="tabUploadBtn" onclick="switchCaptureTab('UPLOAD')">
+              📁 Chọn file / Kéo thả / Dán ảnh (Ctrl+V)
+            </button>
+            <button class="tab-btn" id="tabCameraBtn" onclick="switchCaptureTab('CAMERA')">
+              🎥 Mở Camera chụp trực tiếp
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 12px;">
+            <label for="resizePreset" style="font-weight: 600; color: var(--gray-700);">Tự động Resize:</label>
+            <select id="resizePreset" style="padding: 5px 8px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 12px;">
+              <option value="800">Nhỏ gọn (Max 800px ~70KB)</option>
+              <option value="1200" selected>Chuẩn đẹp (Max 1200px ~140KB)</option>
+              <option value="1600">Chi tiết cao (Max 1600px ~240KB)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Upload / Drag-Drop / Paste View -->
+        <div id="uploadPane">
+          <div class="dropzone" id="photoDropzone" onclick="document.getElementById('photoFileInput').click()">
+            <div style="font-size: 32px; margin-bottom: 6px;">📸</div>
+            <div style="font-weight: 700; font-size: 14.5px; color: var(--primary);">
+              Nhấp để chọn ảnh (hoặc chụp từ điện thoại), Kéo thả nhiều ảnh vào đây
+            </div>
+            <div style="font-size: 12.5px; color: var(--gray-500); margin-top: 4px;">
+              Mẹo: Bạn cũng có thể nhấn <strong>Ctrl + V</strong> để dán trực tiếp ảnh vừa chụp màn hình hoặc copy từ Zalo/Teams!
+            </div>
+            <input
+              type="file"
+              id="photoFileInput"
+              accept="image/*"
+              multiple
+              capture="environment"
+              style="display: none;"
+            />
+          </div>
+        </div>
+
+        <!-- Live Camera View -->
+        <div id="cameraPane" style="display: none;">
+          <div class="camera-box">
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <div class="camera-controls">
+              <button class="btn btn-primary" id="snapPhotoBtn">📸 Chụp ảnh</button>
+              <button class="btn btn-light" id="switchCameraBtn">🔄 Đổi Camera (Trước/Sau)</button>
+              <button class="btn btn-danger" id="stopCameraBtn">⏹️ Tắt Camera</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Staged Resized Photos Preview -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 700; color: var(--gray-700);" id="stagedCountLabel">
+              Ảnh chờ lưu vào thư mục Picture (0):
+            </span>
+            <button class="btn btn-outline" id="clearStagedBtn" style="padding: 4px 8px; font-size: 11.5px; display: none;">
+              Xóa danh sách chờ
+            </button>
+          </div>
+          <div class="Staging-grid" id="stagedGrid"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div style="font-size: 12px; color: var(--gray-500);" id="savePathHint">
+          Lưu tự động vào: <strong>Picture/&lt;PartNo&gt;_1.jpg, _2.jpg...</strong>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-outline" onclick="closeCaptureModal()">Hủy</button>
+          <button class="btn btn-success" id="savePhotosBtn" disabled>
+            💾 Lưu vào thư mục Picture
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. View Pictures Gallery Modal -->
+  <div class="modal-backdrop" id="galleryModal">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="galModalTitle">🖼️ Hình ảnh vật tư</h3>
+          <p id="galModalSub" style="font-size: 13px; color: var(--gray-700); margin-top: 3px;"></p>
+        </div>
+        <button class="modal-close" id="closeGalleryModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="gallery-viewer" id="galleryViewer">
+          <button class="gallery-nav-btn gallery-prev" id="galPrevBtn" title="Ảnh trước (◀)">◀</button>
+          <img id="galMainImg" src="" alt="Part Image" />
+          <button class="gallery-nav-btn gallery-next" id="galNextBtn" title="Ảnh tiếp theo (▶)">▶</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+          <div style="font-size: 13px; font-weight: 600; color: var(--gray-700);" id="galFileInfo">
+            File: —
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="zoomGallery(0.25)">🔍+ Phóng to</button>
+            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="zoomGallery(-0.25)">🔍- Thu nhỏ</button>
+            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="rotateGallery()">🔄 Xoay 90°</button>
+            <a class="btn btn-outline" id="galOpenRawBtn" target="_blank" style="padding: 5px 10px; font-size: 12px;">↗️ Mở ảnh gốc</a>
+            <button class="btn btn-danger" id="galDeleteBtn" style="padding: 5px 10px; font-size: 12px;">🗑️ Xóa ảnh này</button>
+            <button class="btn btn-primary" id="galAddMoreBtn" style="padding: 5px 10px; font-size: 12px;">➕ Chụp / Thêm ảnh mới</button>
+          </div>
+        </div>
+
+        <div class="gallery-thumbs" id="galThumbs"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Part Detail Modal -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalPartNo">Part No</h3>
+          <p id="modalPartSub" style="font-size: 13px; color: var(--gray-700); margin-top: 4px;"></p>
+        </div>
+        <button class="modal-close" id="closeModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 10px; margin-bottom: 14px;" id="modalPicBar"></div>
+        <div class="detail-grid" id="modalDetailGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Image Search Modal -->
+  <div class="modal-backdrop" id="imageSearchModal">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-family: inherit;">📷 Tìm kiếm bằng hình ảnh</h3>
+          <p style="font-size: 12px; color: var(--gray-500); margin-top: 3px;">
+            Nhận diện Part No, Model, thông số và mô tả từ nhãn mác, nameplate hoặc ảnh phụ tùng
+          </p>
+        </div>
+        <button class="modal-close" id="closeImgSearchModalBtn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div id="imgSearchDropzone" class="img-search-dropzone">
+          <div class="isd-icon">📸</div>
+          <div class="isd-title">Kéo &amp; thả ảnh vào đây hoặc nhấp để chọn</div>
+          <div class="isd-sub">Hỗ trợ JPG, PNG, WEBP hoặc nhấn <strong>Ctrl + V</strong> để dán ảnh chụp màn hình</div>
+          <button type="button" class="btn btn-primary" id="selectImgSearchBtn" style="margin-top: 14px;">
+            📁 Chọn file ảnh từ thiết bị
+          </button>
+        </div>
+
+        <div id="imgSearchLoading" style="display: none; text-align: center; padding: 25px 10px;">
+          <div class="spinner" style="margin: 0 auto 12px; width: 34px; height: 34px; border-width: 3px;"></div>
+          <div style="font-weight: 600; font-size: 14px; color: var(--primary);">Đang phân tích hình ảnh &amp; font chữ...</div>
+          <div style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Đang trích xuất Part No, Model và đối chiếu dữ liệu tồn kho</div>
+        </div>
+
+        <div id="imgSearchPreviewBox" style="display: none; margin-top: 15px;">
+          <div style="display: flex; gap: 14px; align-items: flex-start; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 12px;">
+            <img id="imgSearchPreviewThumb" src="" style="width: 76px; height: 76px; object-fit: cover; border-radius: 6px; border: 1px solid var(--gray-300);" alt="Preview" />
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: 600; color: var(--gray-900); font-size: 13px;" id="imgSearchPreviewTitle">Từ khóa nhận diện được:</div>
+              <div id="imgSearchDetectedTags" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;"></div>
+              <div id="imgSearchRawDetected" style="margin-top: 8px; font-size: 11px; color: var(--gray-500); max-height: 50px; overflow-y: auto; font-family: monospace;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toastMsg">Đã thực hiện!</div>
+
+  <!-- Hidden Direct File Upload Inputs -->
+  <input type="file" id="directRowFileInput" accept="image/*" multiple style="display: none;" />
+  <input type="file" id="directRowCameraInput" accept="image/*" capture="environment" style="display: none;" />
+
+  <!-- Preloaded Data Scripts -->
+  <script src="inventory_data.js"></script>
+  <script src="picture_data.js"></script>
+
+  <script>
+    // Local Server API Configuration
+    const API_BASE = "http://localhost:8899";
+    let serverConnected = false;
+
+    // Global State
+    let allParts = [];
+    let filteredParts = [];
+    let picturesMap = {}; // { "17-010.007.004": ["Picture/17-010.007.004_1.jpg", ...] }
+    let currentPage = 1;
+    let pageSize = 50;
+    let currentSort = { column: "Part No", direction: "asc" };
+    let activeQuickCard = "ALL";
+
+    // DOM Elements
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+    const groupFilter = document.getElementById("groupFilter");
+    const stockFilter = document.getElementById("stockFilter");
+    const picFilter = document.getElementById("picFilter");
+    const abcFilter = document.getElementById("abcFilter");
+    const resetFiltersBtn = document.getElementById("resetFiltersBtn");
+    const tableBody = document.getElementById("tableBody");
+    const resultCountInfo = document.getElementById("resultCountInfo");
+    const pageInfoText = document.getElementById("pageInfoText");
+    const prevPageBtn = document.getElementById("prevPageBtn");
+    const nextPageBtn = document.getElementById("nextPageBtn");
+    const pageSizeSelect = document.getElementById("pageSizeSelect");
+    const csvFileInput = document.getElementById("csvFileInput");
+    const exportCsvBtn = document.getElementById("exportCsvBtn");
+    const refreshPicsBtn = document.getElementById("refreshPicsBtn");
+    const dataSourceStatus = document.getElementById("dataSourceStatus");
+    const serverStatusBadge = document.getElementById("serverStatusBadge");
+
+    function getSafePartKey(partNo) {
+      return String(partNo || "").trim().replace(/[\\/:*?"<>|]/g, "_");
+    }
+
+    function getPicturesForPart(partNo) {
+      const key = getSafePartKey(partNo);
+      const list = picturesMap[key] || picturesMap[partNo] || [];
+      return Array.isArray(list) ? list : [list];
+    }
+
+    function resolveImageUrl(relPath) {
+      if (!relPath) return "";
+      if (relPath.startsWith("data:") || relPath.startsWith("http")) return relPath;
+      if (serverConnected) {
+        return `${API_BASE}/${encodeURI(relPath)}?t=${Date.now()}`;
+      }
+      return encodeURI(relPath);
+    }
+
+    // Initialize App - Render ngay tuc thi khong can cho
+    function initApp() {
+      if (window.PRELOADED_PICTURES && typeof window.PRELOADED_PICTURES === "object") {
+        picturesMap = window.PRELOADED_PICTURES;
+      }
+
+      if (window.PRELOADED_INVENTORY_DATA && Array.isArray(window.PRELOADED_INVENTORY_DATA)) {
+        loadDataset(
+          window.PRELOADED_INVENTORY_DATA,
+          `Dữ liệu từ Inventory Parts.CSV (${window.PRELOADED_INVENTORY_TIME || "Mặc định"})`
+        );
+      } else {
+        dataSourceStatus.textContent = "Chưa có dữ liệu. Vui lòng chạy Cap_Nhat_Du_Lieu.bat.";
+      }
+
+      // Dong bo anh chay ngam (khong chan UI)
+      syncPicturesFromServer(false);
+    }
+
+    async function syncPicturesFromServer(showNotice = false) {
+      try {
+        const res = await fetch(`${API_BASE}/api/pictures`, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.ok && data.pictures) {
+            serverConnected = true;
+            picturesMap = data.pictures;
+            serverStatusBadge.className = "server-badge server-online";
+            serverStatusBadge.textContent = "🟢 Đã kết nối trực tiếp thư mục Picture";
+            updateKPIs();
+            renderTable();
+            if (showNotice) showToast("Đã cập nhật kho ảnh từ thư mục Picture!");
+            return true;
+          }
+        }
+      } catch (e) {
+        serverConnected = false;
+        serverStatusBadge.className = "server-badge server-offline";
+        serverStatusBadge.textContent = "⚡ Chế độ xem trực tiếp (Mở Khoi_Dong_Web_App.bat để tự lưu thẳng vào Picture)";
+      }
+      return false;
+    }
+
+    if (refreshPicsBtn) {
+      refreshPicsBtn.addEventListener("click", () => syncPicturesFromServer(true));
+    }
+
+    function normalizeRow(row) {
+      // Lay chinh xac gia tri tu cot Stock
+      const rawStock = row["Stock"] !== undefined && row["Stock"] !== "" 
+        ? row["Stock"] 
+        : (row["Quantity Stock"] !== undefined ? row["Quantity Stock"] : row["On Hand Qty"]);
+      const qty = parseFloat(rawStock) || 0;
+      const poPending = parseFloat(row["PO_Pending_Qty"]) || 0;
+      const leadTime = parseFloat(row["Purchasing Lead Time"] || row["Expected Lead Time"]) || 0;
+      
+      const groupVal = row["Group"] || (row["Commodity Group 2"] ? (row["Commodity Group Description"] ? `${row["Commodity Group 2"]} - ${row["Commodity Group Description"]}` : row["Commodity Group 2"]) : "(Chưa phân nhóm)");
+
+      return {
+        ...row,
+        _qty: qty,
+        _poPending: poPending,
+        _leadTime: leadTime,
+        _group: groupVal,
+        _searchStr: [
+          row["Part No"],
+          row["Part Description in Use"],
+          row["Type Designation"],
+          row["Part Description"],
+          row["Dimension/Quality"],
+          row["Product Family Description"],
+          row["Commodity Group 2"],
+          row["Commodity Group Description"],
+          row["Accounting Group Description"],
+          groupVal
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+      };
+    }
+
+    function loadDataset(rawArray, sourceLabel) {
+      allParts = rawArray.map(normalizeRow);
+      dataSourceStatus.textContent = `${sourceLabel} • ${allParts.length.toLocaleString("vi-VN")} vật tư`;
+      populateDropdowns();
+      updateKPIs();
+      applyFilters();
+    }
+
+    function populateSelectWithCounts(selectEl, fieldName, defaultLabel) {
+      const counts = {};
+      allParts.forEach((p) => {
+        const val = (p[fieldName] || "").trim();
+        const key = val === "" ? "(Chưa phân loại)" : val;
+        counts[key] = (counts[key] || 0) + 1;
+      });
+
+      const sortedKeys = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+      selectEl.innerHTML = `<option value="">${defaultLabel}</option>`;
+      sortedKeys.forEach((key) => {
+        const rawVal = key === "(Chưa phân loại)" ? "__EMPTY__" : key;
+        const opt = document.createElement("option");
+        opt.value = rawVal;
+        opt.textContent = `${key} (${counts[key]})`;
+        selectEl.appendChild(opt);
+      });
+    }
+
+    function populateDropdowns() {
+      populateSelectWithCounts(groupFilter, "Group", "-- Tất cả nhóm (Group) --");
+      populateSelectWithCounts(abcFilter, "ABC Class", "-- Tất cả (A / B / C) --");
+    }
+
+    function updateKPIs() {
+      // Dashboard đã được gỡ bỏ theo yêu cầu
+    }
+
+    function matchDropdown(rowVal, filterVal) {
+      if (!filterVal) return true;
+      const trimmed = (rowVal || "").trim();
+      if (filterVal === "__EMPTY__") return trimmed === "";
+      return trimmed === filterVal;
+    }
+
+    function applyFilters() {
+      const query = searchInput.value.trim().toLowerCase();
+      clearSearchBtn.style.display = query ? "flex" : "none";
+      const terms = query ? query.split(/\s+/) : [];
+
+      const grpVal = groupFilter.value;
+      const stkVal = stockFilter.value;
+      const picVal = picFilter.value;
+      const abcVal = abcFilter.value;
+
+      filteredParts = allParts.filter((p) => {
+        if (terms.length > 0) {
+          for (let i = 0; i < terms.length; i++) {
+            if (!p._searchStr.includes(terms[i])) return false;
+          }
+        }
+        if (!matchDropdown(p["Group"], grpVal)) return false;
+        if (!matchDropdown(p["ABC Class"], abcVal)) return false;
+
+        if (stkVal === "IN_STOCK" && p._qty <= 0) return false;
+        if (stkVal === "OUT_OF_STOCK" && p._qty > 0) return false;
+
+        if (picVal) {
+          const hasP = getPicturesForPart(p["Part No"]).length > 0;
+          if (picVal === "HAS_PIC" && !hasP) return false;
+          if (picVal === "NO_PIC" && hasP) return false;
+        }
+
+        return true;
+      });
+
+      sortFilteredParts();
+      currentPage = 1;
+      renderTable();
+    }
+
+    function sortFilteredParts() {
+      const col = currentSort.column;
+      const dir = currentSort.direction === "asc" ? 1 : -1;
+
+      filteredParts.sort((a, b) => {
+        if (col === "Stock" || col === "Quantity Stock" || col === "On Hand Qty") {
+          return (a._qty - b._qty) * dir;
+        }
+        if (col === "PO_Pending_Qty") {
+          return (a._poPending - b._poPending) * dir;
+        }
+        if (col === "Expected Lead Time" || col === "Purchasing Lead Time") {
+          return (a._leadTime - b._leadTime) * dir;
+        }
+        const valA = (a[col] || "").toString().toLowerCase();
+        const valB = (b[col] || "").toString().toLowerCase();
+        if (valA < valB) return -1 * dir;
+        if (valA > valB) return 1 * dir;
+        return 0;
+      });
+
+      document.querySelectorAll(".sort-indicator").forEach((el) => (el.textContent = ""));
+      const ind = document.getElementById(`sort-${col}`);
+      if (ind) {
+        ind.textContent = currentSort.direction === "asc" ? "▲" : "▼";
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function highlightText(text, query) {
+      const safe = escapeHtml(text);
+      if (!query) return safe;
+      const terms = query
+        .trim()
+        .split(/\s+/)
+        .filter((t) => t.length > 0)
+        .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      if (terms.length === 0) return safe;
+      const regex = new RegExp(`(${terms.join("|")})`, "gi");
+      return safe.replace(regex, '<mark class="hl">$1</mark>');
+    }
+
+    function renderTable() {
+      const total = filteredParts.length;
+      const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIdx = (currentPage - 1) * pageSize;
+      const endIdx = Math.min(startIdx + pageSize, total);
+      const pageItems = filteredParts.slice(startIdx, endIdx);
+      const query = searchInput.value.trim();
+
+      resultCountInfo.innerHTML =
+        total === 0
+          ? `Không tìm thấy vật tư nào phù hợp`
+          : `Hiển thị <strong>${startIdx + 1}–${endIdx}</strong> trong tổng số <strong>${total.toLocaleString("vi-VN")}</strong> vật tư phù hợp`;
+
+      pageInfoText.textContent = `Trang ${currentPage} / ${totalPages}`;
+      prevPageBtn.disabled = currentPage <= 1;
+      nextPageBtn.disabled = currentPage >= totalPages;
+
+      if (pageItems.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="10" class="empty-state">
+              Không tìm thấy dữ liệu khớp với điều kiện lọc. Hãy thử xóa bớt bộ lọc hoặc từ khóa tìm kiếm.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const rowsHtml = pageItems.map((item, idx) => {
+        const partNo = item["Part No"] || "";
+        const descInUse = item["Part Description in Use"] || "";
+        const partDesc = item["Part Description"] || "";
+        const typeDes = item["Type Designation"] || "";
+        const uom = item["Inventory UoM"] || "";
+        const system = item["Dimension/Quality"] || "";
+        const family = item["Product Family Description"] || "";
+        const status = (item["Part Status Description"] || "").toUpperCase();
+        const leadTime = item["Expected Lead Time"] || item["Purchasing Lead Time"] || "0";
+        const groupDisplay = item["Group"] || (item["Commodity Group 2"] ? `${item["Commodity Group 2"]} - ${item["Commodity Group Description"] || ""}` : "");
+        const qtyClass = item._qty > 0 ? "qty-in-stock" : "qty-out-stock";
+
+        const pics = getPicturesForPart(partNo);
+        const picCount = pics.length;
+        const firstThumb = picCount > 0 ? `<img class="mini-thumb" src="${resolveImageUrl(pics[0])}" alt="thumb" />` : "";
+
+        return `
+          <tr data-index="${startIdx + idx}">
+            <td>
+              <div class="part-no-cell">
+                <span>${highlightText(partNo, query)}</span>
+                <button class="copy-btn" data-copy="${escapeHtml(partNo)}" title="Copy mã Part No">Copy</button>
+              </div>
+            </td>
+            <td>
+              <div class="desc-main">${highlightText(descInUse, query)}</div>
+              ${partDesc ? `<div class="desc-sub">Nhóm: ${highlightText(partDesc, query)}</div>` : ""}
+            </td>
+            <td>${highlightText(typeDes, query)}</td>
+            <td onclick="event.stopPropagation();">
+              <div class="pic-actions">
+                <button type="button" class="pic-btn pic-btn-capture" onclick="onRowCaptureClick(${startIdx + idx}, event)" title="Chụp ảnh trực tiếp cho Part No: ${escapeHtml(partNo)}">
+                  📷 Chụp
+                </button>
+                <button type="button" class="pic-btn pic-btn-upload" onclick="onRowUploadClick(${startIdx + idx}, event)" title="Upload ảnh từ máy tính (tự động resize và lưu vào folder Picture) cho Part No: ${escapeHtml(partNo)}">
+                  📤 Upload
+                </button>
+                <button type="button" class="pic-btn ${picCount > 0 ? "pic-btn-view-has" : "pic-btn-view-empty"}" onclick="onRowViewClick(${startIdx + idx}, event)" title="Xem danh sách ảnh của Part No: ${escapeHtml(partNo)}">
+                  ${firstThumb}
+                  <span>🖼️ Xem (${picCount})</span>
+                </button>
+              </div>
+            </td>
+            <td>
+              <span class="family-tag" style="background:#fef3c7; color:#92400e; font-size:11px;" title="${escapeHtml(groupDisplay)}">
+                ${highlightText(groupDisplay || "Unassigned", query)}
+              </span>
+            </td>
+            <td style="text-align: center;">
+              <span class="qty-badge ${qtyClass}">${item._qty.toLocaleString("vi-VN")}</span>
+            </td>
+            <td style="text-align: center;">
+              ${item._poPending > 0 
+                ? `<span class="qty-badge" style="background:#e0f2fe; color:#0369a1;">+${item._poPending.toLocaleString("vi-VN")}</span>` 
+                : `<span style="color:var(--gray-300);">-</span>`}
+            </td>
+            <td>${escapeHtml(uom)}</td>
+            <td>${highlightText(system, query)}</td>
+            <td>${family ? `<span class="family-tag">${escapeHtml(family)}</span>` : ""}</td>
+            <td><span class="status-pill status-${escapeHtml(status)}">${escapeHtml(status)}</span></td>
+            <td style="text-align: center;">${escapeHtml(leadTime)} ngày</td>
+          </tr>
+        `;
+      });
+
+      tableBody.innerHTML = rowsHtml.join("");
+    }
+
+    // Event Listeners for Filters
+    let searchTimeout = null;
+    searchInput.addEventListener("input", () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        applyFilters();
+      }, 120);
+    });
+
+    clearSearchBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      searchInput.focus();
+      if (document.getElementById("imageSearchResultBanner")) {
+        document.getElementById("imageSearchResultBanner").style.display = "none";
+      }
+      applyFilters();
+    });
+
+    [groupFilter, stockFilter, picFilter, abcFilter].forEach((sel) => {
+      sel.addEventListener("change", () => {
+        applyFilters();
+      });
+    });
+
+    resetFiltersBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      groupFilter.value = "";
+      stockFilter.value = "";
+      picFilter.value = "";
+      abcFilter.value = "";
+      if (document.getElementById("imageSearchResultBanner")) {
+        document.getElementById("imageSearchResultBanner").style.display = "none";
+      }
+      applyFilters();
+    });
+
+    pageSizeSelect.addEventListener("change", () => {
+      pageSize = parseInt(pageSizeSelect.value, 10) || 50;
+      currentPage = 1;
+      renderTable();
+    });
+
+    prevPageBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+      }
+    });
+
+    nextPageBtn.addEventListener("click", () => {
+      const totalPages = Math.ceil(filteredParts.length / pageSize);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+      }
+    });
+
+    document.querySelectorAll("thead th[data-sort]").forEach((th) => {
+      th.addEventListener("click", () => {
+        const col = th.getAttribute("data-sort");
+        if (currentSort.column === col) {
+          currentSort.direction = currentSort.direction === "asc" ? "desc" : "asc";
+        } else {
+          currentSort.column = col;
+          currentSort.direction = col === "On Hand Qty" ? "desc" : "asc";
+        }
+        sortFilteredParts();
+        renderTable();
+      });
+    });
+
+    // Table Click Delegation
+    tableBody.addEventListener("click", (e) => {
+      const copyBtn = e.target.closest(".copy-btn");
+      if (copyBtn) {
+        e.stopPropagation();
+        const code = copyBtn.getAttribute("data-copy");
+        navigator.clipboard.writeText(code).then(() => {
+          showToast(`Đã copy mã: ${code}`);
+        });
+        return;
+      }
+
+      const capBtn = e.target.closest("[data-capture]");
+      if (capBtn) {
+        e.stopPropagation();
+        const idx = parseInt(capBtn.getAttribute("data-capture"), 10);
+        const item = filteredParts[idx];
+        if (item) openCaptureModal(item, "CAMERA");
+        return;
+      }
+
+      const uploadBtn = e.target.closest("[data-upload]");
+      if (uploadBtn) {
+        e.stopPropagation();
+        const idx = parseInt(uploadBtn.getAttribute("data-upload"), 10);
+        const item = filteredParts[idx];
+        if (item) triggerDirectUpload(item);
+        return;
+      }
+
+      const viewBtn = e.target.closest("[data-view]");
+      if (viewBtn) {
+        e.stopPropagation();
+        const idx = parseInt(viewBtn.getAttribute("data-view"), 10);
+        const item = filteredParts[idx];
+        if (item) openGalleryModal(item);
+        return;
+      }
+
+      const tr = e.target.closest("tr[data-index]");
+      if (tr) {
+        const idx = parseInt(tr.getAttribute("data-index"), 10);
+        const item = filteredParts[idx];
+        if (item) openDetailModal(item);
+      }
+    });
+
+    function showToast(msg) {
+      const toast = document.getElementById("toastMsg");
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+
+    // =========================================================================
+    // 1. CAPTURE & AUTO-RESIZE MODAL LOGIC
+    // =========================================================================
+    const captureModal = document.getElementById("captureModal");
+    const closeCaptureModalBtn = document.getElementById("closeCaptureModalBtn");
+    const photoFileInput = document.getElementById("photoFileInput");
+    const photoDropzone = document.getElementById("photoDropzone");
+    const stagedGrid = document.getElementById("stagedGrid");
+    const stagedCountLabel = document.getElementById("stagedCountLabel");
+    const clearStagedBtn = document.getElementById("clearStagedBtn");
+    const savePhotosBtn = document.getElementById("savePhotosBtn");
+    const resizePreset = document.getElementById("resizePreset");
+    const cameraVideo = document.getElementById("cameraVideo");
+    const snapPhotoBtn = document.getElementById("snapPhotoBtn");
+    const switchCameraBtn = document.getElementById("switchCameraBtn");
+    const stopCameraBtn = document.getElementById("stopCameraBtn");
+
+    let activeCapturePart = null;
+    let stagedImages = []; // [{ dataUrl, width, height, sizeKB }]
+    let mediaStream = null;
+    let currentFacingMode = "environment";
+
+    function openCaptureModal(partItem, initialTab = "CAMERA") {
+      activeCapturePart = partItem;
+      stagedImages = [];
+      renderStagedImages();
+
+      const partNo = partItem["Part No"] || "";
+      document.getElementById("capModalTitle").textContent = `📷 Chụp / Thêm ảnh: ${partNo}`;
+      document.getElementById("capModalSub").textContent = partItem["Part Description in Use"] || "";
+      document.getElementById("savePathHint").innerHTML = `Lưu tự động vào: <strong>Picture/${escapeHtml(getSafePartKey(partNo))}_1.jpg, _2.jpg...</strong>`;
+
+      switchCaptureTab(initialTab);
+      captureModal.classList.add("open");
+    }
+
+    // Direct Row Click Handlers
+    window.onRowCaptureClick = function(idx, event) {
+      if (event) event.stopPropagation();
+      const item = filteredParts[idx];
+      if (item) triggerDirectCamera(item);
+    };
+
+    window.onRowUploadClick = function(idx, event) {
+      if (event) event.stopPropagation();
+      const item = filteredParts[idx];
+      if (item) triggerDirectUpload(item);
+    };
+
+    window.onRowViewClick = function(idx, event) {
+      if (event) event.stopPropagation();
+      const item = filteredParts[idx];
+      if (item) openGalleryModal(item);
+    };
+
+    const directRowFileInput = document.getElementById("directRowFileInput");
+    const directRowCameraInput = document.getElementById("directRowCameraInput");
+    let pendingUploadPart = null;
+
+    function triggerDirectUpload(partItem) {
+      pendingUploadPart = partItem;
+      directRowFileInput.value = "";
+      directRowFileInput.click();
+    }
+
+    function triggerDirectCamera(partItem) {
+      pendingUploadPart = partItem;
+      directRowCameraInput.value = "";
+      directRowCameraInput.click();
+    }
+
+    async function handleProcessedFiles(files) {
+      if (!files || files.length === 0 || !pendingUploadPart) return;
+
+      const partItem = pendingUploadPart;
+      const partNo = partItem["Part No"];
+      const maxDim = 1200; // Resize standard đẹp và nhẹ ~120KB
+      showToast(`⏳ Đang xử lý & lưu ${files.length} ảnh cho Part ${partNo}...`);
+
+      const resizedList = [];
+      for (const file of files) {
+        try {
+          const dataUrl = await readFileAsDataURL(file);
+          const img = await loadImageElement(dataUrl);
+          const resized = resizeSourceToDataUrl(img, img.naturalWidth, img.naturalHeight, maxDim, 0.82);
+          resizedList.push(resized);
+        } catch (err) {
+          console.error("Lỗi resize ảnh:", err);
+        }
+      }
+
+      if (resizedList.length === 0) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/upload`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            partNo: partNo,
+            images: resizedList.map((s) => ({ dataUrl: s.dataUrl, ext: "jpg" }))
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok) {
+            picturesMap = data.pictures || picturesMap;
+            updateKPIs();
+            renderTable();
+            showToast(`✅ Đã lưu ${data.saved.length} ảnh vào folder Picture cho mã ${partNo}!`);
+            return;
+          }
+        }
+        throw new Error("Không kết nối được server");
+      } catch (err) {
+        // Fallback: Tải file đã resize về máy theo PartNo_1.jpg
+        const safeKey = getSafePartKey(partNo);
+        const existingCount = getPicturesForPart(partNo).length;
+        resizedList.forEach((img, idx) => {
+          const num = existingCount + idx + 1;
+          const fileName = `${safeKey}_${num}.jpg`;
+          const a = document.createElement("a");
+          a.href = img.dataUrl;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          if (!picturesMap[safeKey]) picturesMap[safeKey] = [];
+          picturesMap[safeKey].push(img.dataUrl);
+        });
+        updateKPIs();
+        renderTable();
+        showToast(`Đã tải xuống ${resizedList.length} ảnh đã resize cho mã ${safeKey}!`);
+      }
+    }
+
+    directRowFileInput.addEventListener("change", (e) => {
+      const files = Array.from(e.target.files).filter((f) => f.type.startsWith("image/"));
+      handleProcessedFiles(files);
+    });
+
+    directRowCameraInput.addEventListener("change", (e) => {
+      const files = Array.from(e.target.files).filter((f) => f.type.startsWith("image/"));
+      handleProcessedFiles(files);
+    });
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject(e);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImageElement(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = (e) => reject(e);
+        img.src = src;
+      });
+    }
+
+    window.closeCaptureModal = function () {
+      stopCameraStream();
+      captureModal.classList.remove("open");
+      activeCapturePart = null;
+      stagedImages = [];
+    };
+
+    closeCaptureModalBtn.addEventListener("click", closeCaptureModal);
+    captureModal.addEventListener("click", (e) => {
+      if (e.target === captureModal) closeCaptureModal();
+    });
+
+    window.switchCaptureTab = function (tab) {
+      document.getElementById("tabUploadBtn").classList.toggle("active", tab === "UPLOAD");
+      document.getElementById("tabCameraBtn").classList.toggle("active", tab === "CAMERA");
+      document.getElementById("uploadPane").style.display = tab === "UPLOAD" ? "block" : "none";
+      document.getElementById("cameraPane").style.display = tab === "CAMERA" ? "block" : "none";
+
+      if (tab === "CAMERA") {
+        startCameraStream();
+      } else {
+        stopCameraStream();
+      }
+    };
+
+    async function startCameraStream() {
+      stopCameraStream();
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Trình duyệt đang mở ở chế độ không hỗ trợ Camera trực tiếp. Hãy dùng tab 'Chọn file / Kéo thả' hoặc mở qua địa chỉ http://localhost:8899.");
+        switchCaptureTab("UPLOAD");
+        return;
+      }
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: currentFacingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
+          audio: false
+        });
+        cameraVideo.srcObject = mediaStream;
+      } catch (err) {
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          cameraVideo.srcObject = mediaStream;
+        } catch (err2) {
+          alert("Không tìm thấy thiết bị Camera hoặc bạn chưa cấp quyền Camera. Bạn vẫn có thể chọn ảnh từ máy hoặc dán ảnh (Ctrl+V).");
+          switchCaptureTab("UPLOAD");
+        }
+      }
+    }
+
+    function stopCameraStream() {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((t) => t.stop());
+        mediaStream = null;
+      }
+      cameraVideo.srcObject = null;
+    }
+
+    switchCameraBtn.addEventListener("click", () => {
+      currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+      startCameraStream();
+    });
+
+    stopCameraBtn.addEventListener("click", () => {
+      switchCaptureTab("UPLOAD");
+    });
+
+    // Snap photo from live video and auto-resize
+    snapPhotoBtn.addEventListener("click", () => {
+      if (!cameraVideo.videoWidth) return;
+      const maxDim = parseInt(resizePreset.value, 10) || 1200;
+      const resized = resizeSourceToDataUrl(cameraVideo, cameraVideo.videoWidth, cameraVideo.videoHeight, maxDim, 0.82);
+      stagedImages.push(resized);
+      renderStagedImages();
+      showToast(`📸 Đã chụp & resize (${resized.width}×${resized.height}px • ${resized.sizeKB}KB)`);
+    });
+
+    // Resize any Image or Video element using HTML5 Canvas
+    function resizeSourceToDataUrl(sourceEl, origW, origH, maxDim = 1200, quality = 0.82) {
+      let targetW = origW;
+      let targetH = origH;
+
+      if (origW > maxDim || origH > maxDim) {
+        if (origW >= origH) {
+          targetW = maxDim;
+          targetH = Math.round((origH * maxDim) / origW);
+        } else {
+          targetH = maxDim;
+          targetW = Math.round((origW * maxDim) / origH);
+        }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = targetW;
+      canvas.height = targetH;
+      const ctx = canvas.getContext("2d");
+
+      // Fill white background for transparent PNGs converted to JPEG
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, targetW, targetH);
+      ctx.drawImage(sourceEl, 0, 0, targetW, targetH);
+
+      const dataUrl = canvas.toDataURL("image/jpeg", quality);
+      const sizeKB = Math.round(((dataUrl.length - 23) * 0.75) / 1024);
+      return { dataUrl, width: targetW, height: targetH, sizeKB };
+    }
+
+    function processImageFiles(fileList) {
+      const files = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
+      if (files.length === 0) return;
+
+      const maxDim = parseInt(resizePreset.value, 10) || 1200;
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const resized = resizeSourceToDataUrl(img, img.naturalWidth, img.naturalHeight, maxDim, 0.82);
+            stagedImages.push(resized);
+            renderStagedImages();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    photoFileInput.addEventListener("change", (e) => {
+      processImageFiles(e.target.files);
+      photoFileInput.value = "";
+    });
+
+    photoDropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      photoDropzone.classList.add("dragover");
+    });
+
+    photoDropzone.addEventListener("dragleave", () => {
+      photoDropzone.classList.remove("dragover");
+    });
+
+    photoDropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      photoDropzone.classList.remove("dragover");
+      if (e.dataTransfer && e.dataTransfer.files) {
+        processImageFiles(e.dataTransfer.files);
+      }
+    });
+
+    // Support Ctrl+V Paste image when Capture Modal is open
+    window.addEventListener("paste", (e) => {
+      if (!captureModal.classList.contains("open")) return;
+      if (e.clipboardData && e.clipboardData.files && e.clipboardData.files.length > 0) {
+        processImageFiles(e.clipboardData.files);
+      }
+    });
+
+    function renderStagedImages() {
+      stagedCountLabel.textContent = `Ảnh đã tự động Resize chờ lưu (${stagedImages.length}):`;
+      clearStagedBtn.style.display = stagedImages.length > 0 ? "inline-flex" : "none";
+      savePhotosBtn.disabled = stagedImages.length === 0;
+
+      if (stagedImages.length === 0) {
+        stagedGrid.innerHTML = "";
+        return;
+      }
+
+      stagedGrid.innerHTML = stagedImages
+        .map(
+          (img, idx) => `
+          <div class="staging-item">
+            <img src="${img.dataUrl}" alt="staged" />
+            <button class="staging-remove" onclick="removeStagedImage(${idx})" title="Bỏ ảnh này">✕</button>
+            <div class="staging-meta">
+              <span>${img.width}×${img.height}</span>
+              <strong>~${img.sizeKB} KB</strong>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    window.removeStagedImage = function (idx) {
+      stagedImages.splice(idx, 1);
+      renderStagedImages();
+    };
+
+    clearStagedBtn.addEventListener("click", () => {
+      stagedImages = [];
+      renderStagedImages();
+    });
+
+    // Save Resized Images to Picture Folder
+    savePhotosBtn.addEventListener("click", async () => {
+      if (!activeCapturePart || stagedImages.length === 0) return;
+      const partNo = activeCapturePart["Part No"];
+      savePhotosBtn.disabled = true;
+      savePhotosBtn.textContent = "⏳ Đang lưu vào Picture...";
+
+      try {
+        const res = await fetch(`${API_BASE}/api/upload`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            partNo: partNo,
+            images: stagedImages.map((s) => ({ dataUrl: s.dataUrl, ext: "jpg" }))
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok) {
+            picturesMap = data.pictures || picturesMap;
+            updateKPIs();
+            renderTable();
+            showToast(`✅ Đã lưu ${data.saved.length} ảnh vào thư mục Picture!`);
+            closeCaptureModal();
+            return;
+          }
+        }
+        throw new Error("Server not reachable");
+      } catch (err) {
+        // Fallback: Download resized image(s) with exact PartNo_N.jpg filename so user can drop into Picture
+        const safeKey = getSafePartKey(partNo);
+        const existingCount = getPicturesForPart(partNo).length;
+        stagedImages.forEach((img, idx) => {
+          const num = existingCount + idx + 1;
+          const fileName = `${safeKey}_${num}.jpg`;
+          const a = document.createElement("a");
+          a.href = img.dataUrl;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          if (!picturesMap[safeKey]) picturesMap[safeKey] = [];
+          picturesMap[safeKey].push(img.dataUrl);
+        });
+        updateKPIs();
+        renderTable();
+        showToast(`Đã tải xuống ${stagedImages.length} ảnh đã resize (${safeKey}_*.jpg)!`);
+        closeCaptureModal();
+      } finally {
+        savePhotosBtn.disabled = false;
+        savePhotosBtn.textContent = "💾 Lưu vào thư mục Picture";
+      }
+    });
+
+    // =========================================================================
+    // 2. GALLERY VIEWER MODAL LOGIC
+    // =========================================================================
+    const galleryModal = document.getElementById("galleryModal");
+    const closeGalleryModalBtn = document.getElementById("closeGalleryModalBtn");
+    const galMainImg = document.getElementById("galMainImg");
+    const galPrevBtn = document.getElementById("galPrevBtn");
+    const galNextBtn = document.getElementById("galNextBtn");
+    const galThumbs = document.getElementById("galThumbs");
+    const galFileInfo = document.getElementById("galFileInfo");
+    const galOpenRawBtn = document.getElementById("galOpenRawBtn");
+    const galDeleteBtn = document.getElementById("galDeleteBtn");
+    const galAddMoreBtn = document.getElementById("galAddMoreBtn");
+
+    let activeGalleryPart = null;
+    let activeGalleryList = [];
+    let activeGalleryIndex = 0;
+    let galZoom = 1;
+    let galRotate = 0;
+
+    function openGalleryModal(partItem) {
+      activeGalleryPart = partItem;
+      const partNo = partItem["Part No"] || "";
+      activeGalleryList = getPicturesForPart(partNo);
+
+      if (activeGalleryList.length === 0) {
+        if (confirm(`Mã vật tư ${partNo} hiện chưa có ảnh nào trong thư mục Picture.\nBạn có muốn chụp hoặc thêm ảnh ngay bây giờ không?`)) {
+          openCaptureModal(partItem);
+        }
+        return;
+      }
+
+      document.getElementById("galModalTitle").textContent = `🖼️ Hình ảnh vật tư: ${partNo} (${activeGalleryList.length} ảnh)`;
+      document.getElementById("galModalSub").textContent = partItem["Part Description in Use"] || "";
+      activeGalleryIndex = 0;
+      renderGallerySlide();
+      galleryModal.classList.add("open");
+    }
+
+    function renderGallerySlide() {
+      if (activeGalleryList.length === 0) {
+        galleryModal.classList.remove("open");
+        return;
+      }
+      if (activeGalleryIndex >= activeGalleryList.length) activeGalleryIndex = activeGalleryList.length - 1;
+      if (activeGalleryIndex < 0) activeGalleryIndex = 0;
+
+      const curFile = activeGalleryList[activeGalleryIndex];
+      const fullUrl = resolveImageUrl(curFile);
+
+      galZoom = 1;
+      galRotate = 0;
+      updateGalleryTransform();
+
+      galMainImg.src = fullUrl;
+      galOpenRawBtn.href = fullUrl;
+      galFileInfo.textContent = `Ảnh ${activeGalleryIndex + 1} / ${activeGalleryList.length} • Đường dẫn: ${curFile.startsWith("data:") ? "Ảnh tạm trên trình duyệt" : curFile}`;
+
+      galPrevBtn.style.display = activeGalleryList.length > 1 ? "flex" : "none";
+      galNextBtn.style.display = activeGalleryList.length > 1 ? "flex" : "none";
+
+      galThumbs.innerHTML = activeGalleryList
+        .map(
+          (f, i) => `
+          <div class="gallery-thumb-item ${i === activeGalleryIndex ? "active" : ""}" onclick="selectGallerySlide(${i})">
+            <img src="${resolveImageUrl(f)}" alt="thumb-${i + 1}" />
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    window.selectGallerySlide = function (idx) {
+      activeGalleryIndex = idx;
+      renderGallerySlide();
+    };
+
+    window.zoomGallery = function (delta) {
+      galZoom = Math.min(3.5, Math.max(0.5, galZoom + delta));
+      updateGalleryTransform();
+    };
+
+    window.rotateGallery = function () {
+      galRotate = (galRotate + 90) % 360;
+      updateGalleryTransform();
+    };
+
+    function updateGalleryTransform() {
+      galMainImg.style.transform = `scale(${galZoom}) rotate(${galRotate}deg)`;
+    }
+
+    galPrevBtn.addEventListener("click", () => {
+      activeGalleryIndex = (activeGalleryIndex - 1 + activeGalleryList.length) % activeGalleryList.length;
+      renderGallerySlide();
+    });
+
+    galNextBtn.addEventListener("click", () => {
+      activeGalleryIndex = (activeGalleryIndex + 1) % activeGalleryList.length;
+      renderGallerySlide();
+    });
+
+    closeGalleryModalBtn.addEventListener("click", () => galleryModal.classList.remove("open"));
+    galleryModal.addEventListener("click", (e) => {
+      if (e.target === galleryModal) galleryModal.classList.remove("open");
+    });
+
+    galAddMoreBtn.addEventListener("click", () => {
+      const part = activeGalleryPart;
+      galleryModal.classList.remove("open");
+      if (part) openCaptureModal(part);
+    });
+
+    galDeleteBtn.addEventListener("click", async () => {
+      if (!activeGalleryPart || activeGalleryList.length === 0) return;
+      const curFile = activeGalleryList[activeGalleryIndex];
+      if (!confirm(`Bạn có chắc muốn xóa file ảnh "${curFile}" khỏi thư mục Picture không?`)) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/delete`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filePath: curFile })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok) {
+            picturesMap = data.pictures || {};
+            activeGalleryList = getPicturesForPart(activeGalleryPart["Part No"]);
+            updateKPIs();
+            renderTable();
+            showToast("🗑️ Đã xóa ảnh khỏi thư mục Picture!");
+            renderGallerySlide();
+            return;
+          }
+        }
+        alert("Không thể xóa file trực tiếp khi chưa chạy dịch vụ kết nối thư mục Picture.");
+      } catch (e) {
+        alert("Không thể xóa file trực tiếp khi chưa chạy dịch vụ kết nối thư mục Picture.");
+      }
+    });
+
+    // Keyboard navigation for Gallery
+    window.addEventListener("keydown", (e) => {
+      if (galleryModal.classList.contains("open")) {
+        if (e.key === "ArrowLeft") galPrevBtn.click();
+        if (e.key === "ArrowRight") galNextBtn.click();
+        if (e.key === "Escape") galleryModal.classList.remove("open");
+      } else if (captureModal.classList.contains("open")) {
+        if (e.key === "Escape") closeCaptureModal();
+      } else if (detailModal.classList.contains("open")) {
+        if (e.key === "Escape") detailModal.classList.remove("open");
+      } else if (document.getElementById("imageSearchModal") && document.getElementById("imageSearchModal").classList.contains("open")) {
+        if (e.key === "Escape") document.getElementById("imageSearchModal").classList.remove("open");
+      }
+    });
+
+    // =========================================================================
+    // 3. PART DETAIL MODAL
+    // =========================================================================
+    const detailModal = document.getElementById("detailModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
+    function openDetailModal(item) {
+      const partNo = item["Part No"] || "N/A";
+      const pics = getPicturesForPart(partNo);
+      document.getElementById("modalPartNo").textContent = partNo;
+      document.getElementById("modalPartSub").textContent = item["Part Description in Use"] || "";
+
+      const modalPicBar = document.getElementById("modalPicBar");
+      modalPicBar.innerHTML = `
+        <button class="btn btn-primary" id="detailCapBtn">📷 Chụp ảnh (${escapeHtml(partNo)})</button>
+        <button class="btn btn-primary" style="background: #9333ea;" id="detailUploadBtn">📤 Upload ảnh (${escapeHtml(partNo)})</button>
+        <button class="btn ${pics.length > 0 ? "btn-success" : "btn-outline"}" id="detailViewBtn">
+          🖼️ Xem ảnh của vật tư này (${pics.length})
+        </button>
+      `;
+
+      document.getElementById("detailCapBtn").onclick = () => {
+        detailModal.classList.remove("open");
+        openCaptureModal(item, "CAMERA");
+      };
+      document.getElementById("detailUploadBtn").onclick = () => {
+        detailModal.classList.remove("open");
+        triggerDirectUpload(item);
+      };
+      document.getElementById("detailViewBtn").onclick = () => {
+        detailModal.classList.remove("open");
+        openGalleryModal(item);
+      };
+
+      const fields = [
+        ["Part No", item["Part No"]],
+        ["Nhóm thiết bị (Group)", item["Group"] || (item["Commodity Group 2"] ? `${item["Commodity Group 2"]} - ${item["Commodity Group Description"] || ""}` : "Unassigned")],
+        ["Số lượng tồn kho (Stock)", `${item._qty.toLocaleString("vi-VN")} ${item["Inventory UoM"] || ""}`],
+        ["Đang đặt mua chờ giao (PO Pending)", `${item._poPending.toLocaleString("vi-VN")} ${item["Inventory UoM"] || ""}`],
+        ["Số lượng ảnh trong Picture", `${pics.length} file ảnh`],
+        ["Trạng thái (Part Status)", `${item["Part Status Description"] || ""} (${item["Part Status"] || ""})`],
+        ["Mã hiệu (Type Designation)", item["Type Designation"]],
+        ["Hệ thống / Vị trí (Dimension/Quality)", item["Dimension/Quality"]],
+        ["Nhóm ngành (Product Family)", item["Product Family Description"]],
+        ["Loại vật tư (Part Description)", item["Part Description"]],
+        ["Phân loại ABC", item["ABC Class"]],
+        ["Nhóm hàng hóa (Commodity Group 2)", `${item["Commodity Group 2"] || ""} ${item["Commodity Group Description"] ? `- ${item["Commodity Group Description"]}` : ""}`],
+        ["Phân loại tài sản (Asset Class)", `${item["Asset Class Description"] || ""} (${item["Asset Class"] || ""})`],
+        ["Purchasing Lead Time", `${item["Purchasing Lead Time"] || 0} ngày`],
+        ["Expected Lead Time", `${item["Expected Lead Time"] || 0} ngày`]
+      ];
+
+      const grid = document.getElementById("modalDetailGrid");
+      grid.innerHTML =
+        `<div class="detail-item full-width">
+          <div class="detail-label">Tên & Mô tả đầy đủ (Part Description in Use)</div>
+          <div class="detail-val">${escapeHtml(item["Part Description in Use"] || "N/A")}</div>
+        </div>` +
+        fields
+          .map(
+            ([label, val]) => `
+          <div class="detail-item">
+            <div class="detail-label">${escapeHtml(label)}</div>
+            <div class="detail-val">${escapeHtml(val || "—")}</div>
+          </div>
+        `
+          )
+          .join("");
+
+      detailModal.classList.add("open");
+    }
+
+    closeModalBtn.addEventListener("click", () => detailModal.classList.remove("open"));
+    detailModal.addEventListener("click", (e) => {
+      if (e.target === detailModal) detailModal.classList.remove("open");
+    });
+
+    // CSV Parser & Export
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cur = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        const next = text[i + 1];
+
+        if (inQuotes) {
+          if (ch === '"' && next === '"') {
+            cur += '"';
+            i++;
+          } else if (ch === '"') {
+            inQuotes = false;
+          } else {
+            cur += ch;
+          }
+        } else {
+          if (ch === '"') {
+            inQuotes = true;
+          } else if (ch === ",") {
+            row.push(cur);
+            cur = "";
+          } else if (ch === "\n" || (ch === "\r" && next === "\n")) {
+            row.push(cur);
+            rows.push(row);
+            row = [];
+            cur = "";
+            if (ch === "\r") i++;
+          } else if (ch === "\r") {
+            row.push(cur);
+            rows.push(row);
+            row = [];
+            cur = "";
+          } else {
+            cur += ch;
+          }
+        }
+      }
+      if (cur.length > 0 || row.length > 0) {
+        row.push(cur);
+        rows.push(row);
+      }
+
+      if (rows.length < 2) return [];
+      const headers = rows[0].map((h) => h.replace(/^\uFEFF/, "").trim());
+      const result = [];
+      for (let r = 1; r < rows.length; r++) {
+        if (rows[r].length === 1 && rows[r][0].trim() === "") continue;
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h] = rows[r][idx] !== undefined ? rows[r][idx] : "";
+        });
+        result.push(obj);
+      }
+      return result;
+    }
+
+    if (csvFileInput) {
+      csvFileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const parsed = parseCSV(evt.target.result);
+          if (parsed.length > 0) {
+            loadDataset(parsed, `Đã nạp file: ${file.name}`);
+            showToast(`Đã nạp thành công ${parsed.length.toLocaleString("vi-VN")} vật tư!`);
+          } else {
+            alert("Không đọc được dữ liệu từ file CSV này.");
+          }
+        };
+        reader.readAsText(file, "UTF-8");
+      });
+    }
+
+    if (exportCsvBtn) {
+      exportCsvBtn.addEventListener("click", () => {
+        if (filteredParts.length === 0) {
+          alert("Không có dữ liệu để xuất!");
+          return;
+        }
+        const headers = [
+          "Part No",
+          "Part Description in Use",
+          "On Hand Qty",
+          "Part Description",
+          "Inventory UoM",
+          "Catch UoM",
+          "Type Designation",
+          "Dimension/Quality",
+          "On Hand Catch Qty",
+          "Commodity Group 2",
+          "Asset Class",
+          "Asset Class Description",
+          "Part Status",
+          "Part Status Description",
+          "ABC Class",
+          "Durability Days",
+          "Purchasing Lead Time",
+          "Product Family Description",
+          "Expected Lead Time"
+        ];
+
+        const escapeCsvCell = (val) => {
+          const s = String(val ?? "");
+          if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+            return `"${s.replace(/"/g, '""')}"`;
+          }
+          return s;
+        };
+
+        const csvLines = [
+          headers.map(escapeCsvCell).join(","),
+          ...filteredParts.map((row) => headers.map((h) => escapeCsvCell(row[h])).join(","))
+        ];
+
+        const blob = new Blob(["\uFEFF" + csvLines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Inventory_Filtered_${filteredParts.length}_parts.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`Đã xuất ${filteredParts.length.toLocaleString("vi-VN")} dòng ra file CSV!`);
+      });
+    }
+
+    // =========================================================================
+    // 4. IMAGE SEARCH & OCR SYNTAX ANALYZER
+    // =========================================================================
+    const cameraSearchBtn = document.getElementById("cameraSearchBtn");
+    const imgSearchActionBtn = document.getElementById("imgSearchActionBtn");
+    const imageSearchInput = document.getElementById("imageSearchInput");
+    const imageSearchModal = document.getElementById("imageSearchModal");
+    const closeImgSearchModalBtn = document.getElementById("closeImgSearchModalBtn");
+    const imgSearchDropzone = document.getElementById("imgSearchDropzone");
+    const selectImgSearchBtn = document.getElementById("selectImgSearchBtn");
+    const imgSearchLoading = document.getElementById("imgSearchLoading");
+    const imgSearchPreviewBox = document.getElementById("imgSearchPreviewBox");
+    const imgSearchPreviewThumb = document.getElementById("imgSearchPreviewThumb");
+    const imgSearchDetectedTags = document.getElementById("imgSearchDetectedTags");
+    const imgSearchRawDetected = document.getElementById("imgSearchRawDetected");
+    const imageSearchResultBanner = document.getElementById("imageSearchResultBanner");
+    const isbImgThumb = document.getElementById("isbImgThumb");
+    const isbStatusText = document.getElementById("isbStatusText");
+    const isbTags = document.getElementById("isbTags");
+    const isbCloseBtn = document.getElementById("isbCloseBtn");
+
+    function openImageSearchModal() {
+      if (!imageSearchModal) return;
+      imageSearchModal.classList.add("open");
+      if (imgSearchDropzone) imgSearchDropzone.style.display = "block";
+      if (imgSearchLoading) imgSearchLoading.style.display = "none";
+      if (imgSearchPreviewBox) imgSearchPreviewBox.style.display = "none";
+    }
+
+    function closeImageSearchModal() {
+      if (imageSearchModal) imageSearchModal.classList.remove("open");
+    }
+
+    if (cameraSearchBtn) {
+      cameraSearchBtn.addEventListener("click", openImageSearchModal);
+    }
+    if (imgSearchActionBtn) {
+      imgSearchActionBtn.addEventListener("click", openImageSearchModal);
+    }
+    if (closeImgSearchModalBtn) {
+      closeImgSearchModalBtn.addEventListener("click", closeImageSearchModal);
+    }
+    if (imageSearchModal) {
+      imageSearchModal.addEventListener("click", (e) => {
+        if (e.target === imageSearchModal) closeImageSearchModal();
+      });
+    }
+
+    if (selectImgSearchBtn && imageSearchInput) {
+      selectImgSearchBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        imageSearchInput.click();
+      });
+    }
+
+    if (imgSearchDropzone && imageSearchInput) {
+      imgSearchDropzone.addEventListener("click", () => imageSearchInput.click());
+
+      imgSearchDropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        imgSearchDropzone.classList.add("dragover");
+      });
+      imgSearchDropzone.addEventListener("dragleave", () => {
+        imgSearchDropzone.classList.remove("dragover");
+      });
+      imgSearchDropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        imgSearchDropzone.classList.remove("dragover");
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+          processImageForSearch(files[0]);
+        }
+      });
+    }
+
+    if (imageSearchInput) {
+      imageSearchInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          processImageForSearch(file);
+          imageSearchInput.value = "";
+        }
+      });
+    }
+
+    if (isbCloseBtn && imageSearchResultBanner) {
+      isbCloseBtn.addEventListener("click", () => {
+        imageSearchResultBanner.style.display = "none";
+      });
+    }
+
+    // Drag-and-drop directly onto search input box
+    const searchBoxElem = document.querySelector(".search-box");
+    if (searchBoxElem) {
+      searchBoxElem.addEventListener("dragover", (e) => {
+        e.preventDefault();
+      });
+      searchBoxElem.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0 && files[0].type.startsWith("image/")) {
+          processImageForSearch(files[0]);
+        }
+      });
+    }
+
+    // Support Direct Paste (Ctrl + V) into Search Box
+    if (searchInput) {
+      searchInput.addEventListener("paste", (e) => {
+        const items = e.clipboardData && e.clipboardData.items;
+        if (!items) return;
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type && items[i].type.startsWith("image/")) {
+            const file = items[i].getAsFile();
+            if (file) {
+              e.preventDefault();
+              processImageForSearch(file);
+              return;
+            }
+          }
+        }
+      });
+    }
+
+    // Support Global Paste (Ctrl + V) of Images anywhere on the page
+    document.addEventListener("paste", (e) => {
+      // If user is pasting into a text field with text data, let default happen
+      const items = e.clipboardData && e.clipboardData.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type && items[i].type.startsWith("image/")) {
+          const file = items[i].getAsFile();
+          if (file) {
+            e.preventDefault();
+            processImageForSearch(file);
+            return;
+          }
+        }
+      }
+    });
+
+    // Resize & Preprocess image safely before sending to OCR
+    function readFileAsOptimizedDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width;
+            let h = img.height;
+            let scale = 1.0;
+
+            // Neu anh nho (nhan cat goc, tem mac nho), phong to 3x - 4x va them vien trang de OCR doc net tung chu cai
+            if (h < 180 || w < 500) {
+              scale = Math.max(2.5, Math.min(4.0, 320 / Math.max(1, h)));
+            } else if (w > 1600 || h > 1600) {
+              scale = 1600 / Math.max(w, h);
+            }
+
+            const drawW = Math.round(w * scale);
+            const drawH = Math.round(h * scale);
+            const pad = 35; // Vien trang xung quanh giup OCR khong bi mat net sat mep
+
+            const canvas = document.createElement("canvas");
+            canvas.width = drawW + pad * 2;
+            canvas.height = drawH + pad * 2;
+            const ctx = canvas.getContext("2d");
+
+            // Nen trang sach
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(img, pad, pad, drawW, drawH);
+
+            resolve(canvas.toDataURL("image/png"));
+          };
+          img.onerror = () => resolve(e.target.result);
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function processImageForSearch(file) {
+      if (!file || !file.type.startsWith("image/")) {
+        showToast("Vui lòng chọn hoặc dán file hình ảnh hợp lệ!");
+        return;
+      }
+
+      openImageSearchModal();
+      if (imgSearchDropzone) imgSearchDropzone.style.display = "none";
+      if (imgSearchPreviewBox) imgSearchPreviewBox.style.display = "none";
+      if (imgSearchLoading) imgSearchLoading.style.display = "block";
+
+      try {
+        const dataUrl = await readFileAsOptimizedDataUrl(file);
+        if (imgSearchPreviewThumb) imgSearchPreviewThumb.src = dataUrl;
+        if (isbImgThumb) isbImgThumb.src = dataUrl;
+
+        // Step 1: Call Windows native OCR via server.ps1
+        let ocrResult = null;
+        let serverErrorMsg = "";
+        try {
+          const resp = await fetch(`${API_BASE}/api/ocr`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: dataUrl })
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data && data.ok) ocrResult = data;
+          } else {
+            serverErrorMsg = "Máy chủ trả về mã lỗi: " + resp.status;
+          }
+        } catch (serverErr) {
+          console.warn("Server OCR failed:", serverErr);
+          serverErrorMsg = "Không thể kết nối đến Web Server nội bộ (Port 8899). Vui lòng khởi động bằng file 'Khoi_Dong_Web_App.bat'.";
+        }
+
+        if (!ocrResult || !ocrResult.text || ocrResult.text.trim().length === 0) {
+          if (imgSearchLoading) imgSearchLoading.style.display = "none";
+          if (imgSearchDropzone) imgSearchDropzone.style.display = "block";
+          if (serverErrorMsg) {
+            alert(serverErrorMsg);
+          } else {
+            alert("Không nhận diện được nội dung chữ hoặc mã số trên ảnh này. Vui lòng chụp thẳng góc, đủ ánh sáng hoặc chọn ảnh rõ nét hơn.");
+          }
+          return;
+        }
+
+        // Step 2: Analyze syntax, font correction & match against 4.721 parts
+        const analysis = analyzeOcrForParts(ocrResult.text, ocrResult.words || [], ocrResult.lines || []);
+
+        if (imgSearchLoading) imgSearchLoading.style.display = "none";
+        if (imgSearchPreviewBox) imgSearchPreviewBox.style.display = "block";
+        if (imgSearchRawDetected) {
+          imgSearchRawDetected.textContent = `Nội dung quét: "${ocrResult.text.replace(/\s+/g, ' ').trim()}"`;
+        }
+
+        // Render detected tags
+        if (imgSearchDetectedTags) imgSearchDetectedTags.innerHTML = "";
+        if (isbTags) isbTags.innerHTML = "";
+
+        analysis.detectedKeywords.forEach((kw) => {
+          const tag = document.createElement("button");
+          tag.type = "button";
+          tag.className = "isb-tag";
+          tag.textContent = kw.text;
+          tag.title = `${kw.type}: Bấm để lọc`;
+          tag.onclick = () => {
+            searchInput.value = kw.text;
+            applyFilters();
+            closeImageSearchModal();
+            highlightActiveTag(kw.text);
+          };
+          if (imgSearchDetectedTags) imgSearchDetectedTags.appendChild(tag);
+
+          if (isbTags) {
+            const bannerTag = tag.cloneNode(true);
+            bannerTag.onclick = tag.onclick;
+            isbTags.appendChild(bannerTag);
+          }
+        });
+
+        if (analysis.bestSearchQuery) {
+          searchInput.value = analysis.bestSearchQuery;
+          applyFilters();
+
+          const bestDesc = analysis.bestPart ? (analysis.bestPart["Part Description in Use"] || analysis.bestPart["Part Description"] || "") : "";
+          const bestNo = analysis.bestPart ? analysis.bestPart["Part No"] : analysis.bestSearchQuery;
+
+          if (isbStatusText) {
+            isbStatusText.innerHTML = `Phát hiện: <strong style="color:var(--primary);">${escapeHtml(bestNo)}</strong> - ${escapeHtml(bestDesc)} (Khớp ${analysis.confidence}%)`;
+          }
+          if (imageSearchResultBanner) imageSearchResultBanner.style.display = "flex";
+          highlightActiveTag(analysis.bestSearchQuery);
+
+          setTimeout(() => {
+            closeImageSearchModal();
+            showToast(`✨ Đã nhận diện và lọc ra ${filteredParts.length.toLocaleString("vi-VN")} phụ tùng!`);
+          }, 850);
+        } else {
+          if (isbStatusText) {
+            isbStatusText.textContent = `Đã nhận diện từ ảnh nhưng chưa khớp phụ tùng cụ thể. Hãy bấm vào các từ khóa bên dưới.`;
+          }
+          if (imageSearchResultBanner) imageSearchResultBanner.style.display = "flex";
+        }
+      } catch (err) {
+        console.error("Lỗi xử lý ảnh:", err);
+        if (imgSearchLoading) imgSearchLoading.style.display = "none";
+        if (imgSearchDropzone) imgSearchDropzone.style.display = "block";
+        alert("Lỗi khi xử lý hình ảnh: " + err.message);
+      }
+    }
+
+    function highlightActiveTag(query) {
+      const q = (query || "").trim().toUpperCase();
+      document.querySelectorAll(".isb-tag").forEach((t) => {
+        if (t.textContent.trim().toUpperCase() === q) {
+          t.classList.add("active");
+        } else {
+          t.classList.remove("active");
+        }
+      });
+    }
+
+    // Thuat toan rut gon, sieu nhe, khong ton tai nguyen: Trich xuat Part No hoac tu khoa truc tiep
+    function analyzeOcrForParts(rawText) {
+      const text = (rawText || "").trim();
+      const detectedKeywords = [];
+      const charToDigit = { 'e':'0', 'o':'0', 'q':'0', 'd':'0', 'l':'1', 'i':'1', '|':'1', 's':'5', 'b':'8', 'z':'2' };
+
+      // 1. Tim Part No CMIT (17-xxx.xxx.xxx) co tu dong sua loi font so 0/1
+      const regex17 = /(?:17|[li|!][7t])[._\s-]+([a-zA-Z0-9]{2,4})[._\s-]+([a-zA-Z0-9]{2,4})(?:[._\s-]+([a-zA-Z0-9]{2,5}))?/i;
+      const m17 = regex17.exec(text);
+      if (m17) {
+        const cleanGrp = (g) => {
+          let res = "";
+          for (let c of g.toLowerCase()) {
+            res += (charToDigit[c] !== undefined ? charToDigit[c] : c);
+          }
+          return res.length === 2 ? "0" + res : (res.length === 1 ? "00" + res : res.slice(0, 3));
+        };
+        const p1 = cleanGrp(m17[1]);
+        const p2 = cleanGrp(m17[2]);
+        const p3 = m17[3] ? cleanGrp(m17[3]) : "";
+        const partNo = p3 ? `17-${p1}.${p2}.${p3}` : `17-${p1}.${p2}`;
+        detectedKeywords.push({ text: partNo, type: "Part No" });
+
+        const matchedItem = allParts.find((p) => p["Part No"] === partNo);
+
+        return {
+          bestSearchQuery: partNo,
+          bestPart: matchedItem,
+          detectedKeywords: detectedKeywords,
+          confidence: 98
+        };
+      }
+
+      // 2. Trich xuat tu khoa dai nhat (Model / Name)
+      const words = text.split(/[\s,;:\r\n]+/).filter((w) => w.length >= 3);
+      if (words.length > 0) {
+        words.forEach((w) => detectedKeywords.push({ text: w, type: "Từ khóa" }));
+        const longest = [...words].sort((a, b) => b.length - a.length)[0];
+        const matchedItem = allParts.find((p) => (p._searchStr || "").includes(longest.toLowerCase()));
+        return {
+          bestSearchQuery: longest,
+          bestPart: matchedItem,
+          detectedKeywords: detectedKeywords.slice(0, 5),
+          confidence: 85
+        };
+      }
+
+      return {
+        bestSearchQuery: "",
+        bestPart: null,
+        detectedKeywords: [],
+        confidence: 0
+      };
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
