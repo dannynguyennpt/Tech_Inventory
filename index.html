@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -1231,10 +1231,10 @@
               <th data-sort="Part No">Part No <span class="sort-indicator" id="sort-Part No"></span></th>
               <th data-sort="Part Description in Use">Tên &amp; Mô tả vật tư (In Use) <span class="sort-indicator" id="sort-Part Description in Use"></span></th>
               <th data-sort="Type Designation">Mã hiệu (Type Designation) <span class="sort-indicator" id="sort-Type Designation"></span></th>
-              <th style="text-align: center; cursor: default;">Hình ảnh (Picture)</th>
-              <th data-sort="Group">Nhóm (Group) <span class="sort-indicator" id="sort-Group"></span></th>
               <th data-sort="Stock" style="text-align: center;">Stock Qty <span class="sort-indicator" id="sort-Stock"></span></th>
               <th data-sort="PO_Pending_Qty" style="text-align: center;">PO Pending <span class="sort-indicator" id="sort-PO_Pending_Qty"></span></th>
+              <th style="text-align: center; cursor: default;">Hình ảnh (Picture)</th>
+              <th data-sort="Group">Nhóm (Group) <span class="sort-indicator" id="sort-Group"></span></th>
               <th data-sort="Inventory UoM">ĐVT</th>
               <th data-sort="Dimension/Quality">Hệ thống / Vị trí <span class="sort-indicator" id="sort-Dimension/Quality"></span></th>
               <th data-sort="Product Family Description">Nhóm ngành <span class="sort-indicator" id="sort-Product Family Description"></span></th>
@@ -1785,7 +1785,7 @@ window.PRELOADED_INVENTORY_TIME = '07/11/2026 21:38 (Dong bo chuan 4.721 part tu
       if (pageItems.length === 0) {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="10" class="empty-state">
+            <td colspan="12" class="empty-state">
               Không tìm thấy dữ liệu khớp với điều kiện lọc. Hãy thử xóa bớt bộ lọc hoặc từ khóa tìm kiếm.
             </td>
           </tr>
@@ -1823,6 +1823,14 @@ window.PRELOADED_INVENTORY_TIME = '07/11/2026 21:38 (Dong bo chuan 4.721 part tu
               ${partDesc ? `<div class="desc-sub">Nhóm: ${highlightText(partDesc, query)}</div>` : ""}
             </td>
             <td>${highlightText(typeDes, query)}</td>
+            <td style="text-align: center;">
+              <span class="qty-badge ${qtyClass}">${item._qty.toLocaleString("vi-VN")}</span>
+            </td>
+            <td style="text-align: center;">
+              ${item._poPending > 0 
+                ? `<span class="qty-badge" style="background:#e0f2fe; color:#0369a1;">+${item._poPending.toLocaleString("vi-VN")}</span>` 
+                : `<span style="color:var(--gray-300);">-</span>`}
+            </td>
             <td onclick="event.stopPropagation();">
               <div class="pic-actions">
                 <button type="button" class="pic-btn pic-btn-capture" onclick="onRowCaptureClick(${startIdx + idx}, event)" title="Chụp ảnh trực tiếp cho Part No: ${escapeHtml(partNo)}">
@@ -1841,14 +1849,6 @@ window.PRELOADED_INVENTORY_TIME = '07/11/2026 21:38 (Dong bo chuan 4.721 part tu
               <span class="family-tag" style="background:#fef3c7; color:#92400e; font-size:11px;" title="${escapeHtml(groupDisplay)}">
                 ${highlightText(groupDisplay || "Unassigned", query)}
               </span>
-            </td>
-            <td style="text-align: center;">
-              <span class="qty-badge ${qtyClass}">${item._qty.toLocaleString("vi-VN")}</span>
-            </td>
-            <td style="text-align: center;">
-              ${item._poPending > 0 
-                ? `<span class="qty-badge" style="background:#e0f2fe; color:#0369a1;">+${item._poPending.toLocaleString("vi-VN")}</span>` 
-                : `<span style="color:var(--gray-300);">-</span>`}
             </td>
             <td>${escapeHtml(uom)}</td>
             <td>${highlightText(system, query)}</td>
