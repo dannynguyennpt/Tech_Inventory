@@ -1,0 +1,1 @@
+﻿window.PRELOADED_PICTURES = {"17-000.094.001":["Picture/17-000.094.001_1.jpg","Picture/17-000.094.001_2.jpg"],"17-010.006.004":["Picture/17-010.006.004_1.jpg","Picture/17-010.006.004_2.jpg"]};
